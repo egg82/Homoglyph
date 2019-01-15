@@ -6,6 +6,14 @@ import org.junit.jupiter.api.Test;
 
 public class StandardTests {
     @Test
+    public void testASCII() throws IOException {
+        HomoglyphHelper helper = HomoglyphHelper.create();
+
+        Assertions.assertEquals("TEST", helper.toASCII("TEST"));
+        Assertions.assertEquals("test", helper.toASCII("test"));
+    }
+
+    @Test
     public void testEquals() throws IOException {
         HomoglyphHelper helper = HomoglyphHelper.create();
 
