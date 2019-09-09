@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class HomoglyphTests {
+public class HomoglyphTest {
     @Test
     public void testASCII() throws IOException {
         HomoglyphHelper helper = HomoglyphHelper.create();
