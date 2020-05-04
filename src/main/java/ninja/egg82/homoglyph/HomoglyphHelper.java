@@ -30,7 +30,7 @@ public class HomoglyphHelper {
                 for (String code : line.split(",")) {
                     try {
                         set.add(Integer.parseInt(code.trim(), 16));
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) { }
                 }
                 homoglyphs.add(set);
             }
@@ -428,9 +428,7 @@ public class HomoglyphHelper {
      * @param needle The string to search for
      * @return Whether or not the haystack contains the needle
      */
-    public boolean contains(String haystack, String needle) {
-        return indexOf(haystack, needle) > -1;
-    }
+    public boolean contains(String haystack, String needle) { return indexOf(haystack, needle) > -1; }
 
     private IntList toChars(String text) {
         IntList unicode = new IntArrayList(text.length());
