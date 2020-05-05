@@ -154,7 +154,10 @@ public class HomoglyphHelper {
             } else {
                 Integer r = alphanumericCache.getOrDefault(c, Integer.valueOf(c));
                 if (r < 0 || r > 255) {
-                    r = asciiCache.getOrDefault(c, Integer.valueOf(c));
+                    r = standardCache.getOrDefault(c, Integer.valueOf(c));
+                    if (r < 0 || r > 255) {
+                        r = asciiCache.getOrDefault(c, Integer.valueOf(c));
+                    }
                 }
                 result.append(Character.toChars(r));
             }
