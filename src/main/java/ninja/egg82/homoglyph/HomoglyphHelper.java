@@ -54,6 +54,14 @@ public class HomoglyphHelper {
     }
 
     /**
+     * Alphanumeric cache where the key is an int character and the value is an ASCII Integer character that is similar to the key
+     */
+    private Int2ObjectMap<Integer> alphanumericCache = new Int2ObjectOpenHashMap<>();
+    /**
+     * Standard keyboard cache where the key is an int character and the value is an ASCII Integer character that is similar to the key
+     */
+    private Int2ObjectMap<Integer> standardCache = new Int2ObjectOpenHashMap<>();
+    /**
      * ASCII cache where the key is an int character and the value is an ASCII Integer character that is similar to the key
      */
     private Int2ObjectMap<Integer> asciiCache = new Int2ObjectOpenHashMap<>();
@@ -67,22 +75,46 @@ public class HomoglyphHelper {
             throw new IllegalArgumentException("homoglyphs cannot be null.");
         }
 
+        // We want to cache specific ranges first, because
+        // that's what you're "expecting" when you convert down
+        // | looks like I, and both are ASCII, but we want I
+        cacheASCII(homoglyphs, alphanumericCache, 97, 125); // a-z
+        cacheASCII(homoglyphs, alphanumericCache, 65, 90); // A-Z
+        cacheASCII(homoglyphs, alphanumericCache, 48, 57); // 0-9
+
+        cacheASCII(homoglyphs, standardCache, 97, 125); // a-z
+        cacheASCII(homoglyphs, standardCache, 65, 90); // A-Z
+        cacheASCII(homoglyphs, standardCache, 48, 57); // 0-9
+        cacheASCII(homoglyphs, standardCache, 32, 126); // Full keyboard range
+
+        cacheASCII(homoglyphs, asciiCache, 97, 125); // a-z
+        cacheASCII(homoglyphs, asciiCache, 65, 90); // A-Z
+        cacheASCII(homoglyphs, asciiCache, 48, 57); // 0-9
+        cacheASCII(homoglyphs, asciiCache, 32, 126); // Full keyboard range
+        cacheASCII(homoglyphs, asciiCache, 0, 255); // Full ASCII range
+    }
+
+    private void cacheASCII(List<IntSet> homoglyphs, Int2ObjectMap<Integer> cache, int begin, int end) {
         for (IntSet glyphs : homoglyphs) {
             // Each IntSet is a bunch of random unicode/ASCII chars that look alike
             // Try to find an ASCII char in each one
             for (int c : glyphs) {
+                if (homoglyphCache.containsKey(c) && cache.containsKey(c)) {
+                    continue;
+                }
+
                 // Add char set to homoglyph cache (excluding the current char)
                 IntSet modifiedSet = new IntArraySet(glyphs);
                 modifiedSet.remove(c);
-                homoglyphCache.put(c, modifiedSet);
+                if (!homoglyphCache.containsKey(c)) {
+                    homoglyphCache.put(c, modifiedSet);
+                }
 
-                if (c >= 0 && c <= 255) {
+                if (c >= begin && c <= end && !cache.containsKey(c)) {
                     // ASCII char found
-                    for (int u : glyphs) {
+                    for (int u : modifiedSet) {
                         // Add all chars to ASCII cache that are NOT the current char
-                        if (u != c) {
-                            asciiCache.put(u, Integer.valueOf(c));
-                        }
+                        cache.put(u, Integer.valueOf(c));
                     }
                 }
             }
@@ -91,8 +123,70 @@ public class HomoglyphHelper {
 
     /**
      * Returns the string given, but with unicode homoglyphs converted
+     * into their alphanumeric counterparts, and any remaining homoglyphs
+     * turned into their ASCII counterparts.
+     * If there is no homoglyph for a given Unicode character, it will
+     * not be transformed.
+     *
+     * @param unicode The unicode string to alphanumeric-ify
+     * @return The transformed result
+     */
+    public String toAlphanumeric(String unicode) {
+        if (unicode == null) {
+            throw new IllegalArgumentException("unicode cannot be null.");
+        }
+        if (unicode.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        IntList chars = toChars(unicode);
+        for (int c : chars) {
+            if ((c >= 97 && c <= 125) || (c >= 65 && c <= 90) || (c >= 48 && c <= 57)) {
+                result.append(Character.toChars(c));
+            } else {
+                Integer r = alphanumericCache.getOrDefault(c, Integer.valueOf(c));
+                result.append(Character.toChars(r));
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * Returns the string given, but with unicode homoglyphs converted
+     * into their standard character set counterparts, and any remaining homoglyphs
+     * turned into their ASCII counterparts.
+     * If there is no homoglyph for a given Unicode character, it will
+     * not be transformed.
+     *
+     * @param unicode The unicode string to standard-ify
+     * @return The transformed result
+     */
+    public String toStandardCharset(String unicode) {
+        if (unicode == null) {
+            throw new IllegalArgumentException("unicode cannot be null.");
+        }
+        if (unicode.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        IntList chars = toChars(unicode);
+        for (int c : chars) {
+            if (c >= 32 && c <= 126) {
+                result.append(Character.toChars(c));
+            } else {
+                Integer r = standardCache.getOrDefault(c, Integer.valueOf(c));
+                result.append(Character.toChars(r));
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * Returns the string given, but with unicode homoglyphs converted
      * into their ASCII counterparts.
-     * If there is no homoglyph for a given Unicode character, it  will
+     * If there is no homoglyph for a given Unicode character, it will
      * not be transformed.
      *
      * @param unicode The unicode string to ASCII-ify
@@ -109,8 +203,12 @@ public class HomoglyphHelper {
         StringBuilder result = new StringBuilder();
         IntList chars = toChars(unicode);
         for (int c : chars) {
-            Integer r = asciiCache.getOrDefault(c, Integer.valueOf(c));
-            result.append(Character.toChars(r));
+            if (c >= 0 && c <= 255) {
+                result.append(Character.toChars(c));
+            } else {
+                Integer r = standardCache.getOrDefault(c, Integer.valueOf(c));
+                result.append(Character.toChars(r));
+            }
         }
         return result.toString();
     }

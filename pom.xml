@@ -6,10 +6,15 @@
 
     <groupId>ninja.egg82</groupId>
     <artifactId>homoglyph</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
 
         <plugins>
             <plugin>

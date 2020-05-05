@@ -14,6 +14,43 @@ public class StandardTests {
     }
 
     @Test
+    public void testAlphanumeric() throws IOException {
+        HomoglyphHelper helper = HomoglyphHelper.create();
+
+        String A2Z_ASCII = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String a2z_ASCII = "abcdefghijklmnopqrstuvwxyz";
+        String z29_ASCII = "0123456789";
+
+        Assertions.assertTrue(helper.equals(A2Z_ASCII, A2Z_ASCII));
+        Assertions.assertTrue(helper.equals(a2z_ASCII, a2z_ASCII));
+        Assertions.assertTrue(helper.equals(z29_ASCII, z29_ASCII));
+
+        Assertions.assertEquals(A2Z_ASCII, helper.toAlphanumeric(A2Z_ASCII));
+        Assertions.assertEquals(a2z_ASCII, helper.toAlphanumeric(a2z_ASCII));
+        Assertions.assertEquals(z29_ASCII, helper.toAlphanumeric(z29_ASCII));
+    }
+
+    @Test
+    public void testStandardCharset() throws IOException {
+        HomoglyphHelper helper = HomoglyphHelper.create();
+
+        String A2Z_ASCII = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String a2z_ASCII = "abcdefghijklmnopqrstuvwxyz";
+        String z29_ASCII = "0123456789";
+        String symbols_ASCII = "~`!@#$%^&*()_-+={[}]|\\:;\"'<,>.?/";
+
+        Assertions.assertTrue(helper.equals(A2Z_ASCII, A2Z_ASCII));
+        Assertions.assertTrue(helper.equals(a2z_ASCII, a2z_ASCII));
+        Assertions.assertTrue(helper.equals(z29_ASCII, z29_ASCII));
+        Assertions.assertTrue(helper.equals(symbols_ASCII, symbols_ASCII));
+
+        Assertions.assertEquals(A2Z_ASCII, helper.toStandardCharset(A2Z_ASCII));
+        Assertions.assertEquals(a2z_ASCII, helper.toStandardCharset(a2z_ASCII));
+        Assertions.assertEquals(z29_ASCII, helper.toStandardCharset(z29_ASCII));
+        Assertions.assertEquals(symbols_ASCII, helper.toStandardCharset(symbols_ASCII));
+    }
+
+    @Test
     public void testEquals() throws IOException {
         HomoglyphHelper helper = HomoglyphHelper.create();
 
