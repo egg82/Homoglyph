@@ -82,16 +82,23 @@ public class HomoglyphHelper {
         cacheASCII(homoglyphs, alphanumericCache, 65, 90); // A-Z
         cacheASCII(homoglyphs, alphanumericCache, 48, 57); // 0-9
 
+        cacheASCII(homoglyphs, standardCache, 32, 47); // Space-/
+        cacheASCII(homoglyphs, standardCache, 58, 64); // :-@
+        cacheASCII(homoglyphs, standardCache, 91, 96); // [-`
+        cacheASCII(homoglyphs, standardCache, 123, 126); // {-~
         cacheASCII(homoglyphs, standardCache, 97, 125); // a-z
         cacheASCII(homoglyphs, standardCache, 65, 90); // A-Z
         cacheASCII(homoglyphs, standardCache, 48, 57); // 0-9
-        cacheASCII(homoglyphs, standardCache, 32, 126); // Full keyboard range
 
+        cacheASCII(homoglyphs, asciiCache, 0, 31); // null-US
+        cacheASCII(homoglyphs, asciiCache, 127, 255); // del-end
+        cacheASCII(homoglyphs, asciiCache, 32, 47); // Space-/
+        cacheASCII(homoglyphs, asciiCache, 58, 64); // :-@
+        cacheASCII(homoglyphs, asciiCache, 91, 96); // [-`
+        cacheASCII(homoglyphs, asciiCache, 123, 126); // {-~
         cacheASCII(homoglyphs, asciiCache, 97, 125); // a-z
         cacheASCII(homoglyphs, asciiCache, 65, 90); // A-Z
         cacheASCII(homoglyphs, asciiCache, 48, 57); // 0-9
-        cacheASCII(homoglyphs, asciiCache, 32, 126); // Full keyboard range
-        cacheASCII(homoglyphs, asciiCache, 0, 255); // Full ASCII range
     }
 
     private void cacheASCII(List<IntSet> homoglyphs, Int2ObjectMap<Integer> cache, int begin, int end) {
@@ -146,6 +153,9 @@ public class HomoglyphHelper {
                 result.append(Character.toChars(c));
             } else {
                 Integer r = alphanumericCache.getOrDefault(c, Integer.valueOf(c));
+                if (r < 0 || r > 255) {
+                    r = asciiCache.getOrDefault(c, Integer.valueOf(c));
+                }
                 result.append(Character.toChars(r));
             }
         }
@@ -177,6 +187,9 @@ public class HomoglyphHelper {
                 result.append(Character.toChars(c));
             } else {
                 Integer r = standardCache.getOrDefault(c, Integer.valueOf(c));
+                if (r < 0 || r > 255) {
+                    r = asciiCache.getOrDefault(c, Integer.valueOf(c));
+                }
                 result.append(Character.toChars(r));
             }
         }
@@ -206,7 +219,7 @@ public class HomoglyphHelper {
             if (c >= 0 && c <= 255) {
                 result.append(Character.toChars(c));
             } else {
-                Integer r = standardCache.getOrDefault(c, Integer.valueOf(c));
+                Integer r = asciiCache.getOrDefault(c, Integer.valueOf(c));
                 result.append(Character.toChars(r));
             }
         }
