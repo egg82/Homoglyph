@@ -78,7 +78,7 @@ public class HomoglyphHelper {
         // We want to cache specific ranges first, because
         // that's what you're "expecting" when you convert down
         // | looks like I, and both are ASCII, but we want I
-        cacheASCII(homoglyphs, alphanumericCache, 97, 125); // a-z
+        cacheASCII(homoglyphs, alphanumericCache, 97, 122); // a-z
         cacheASCII(homoglyphs, alphanumericCache, 65, 90); // A-Z
         cacheASCII(homoglyphs, alphanumericCache, 48, 57); // 0-9
 
@@ -86,7 +86,7 @@ public class HomoglyphHelper {
         cacheASCII(homoglyphs, standardCache, 58, 64); // :-@
         cacheASCII(homoglyphs, standardCache, 91, 96); // [-`
         cacheASCII(homoglyphs, standardCache, 123, 126); // {-~
-        cacheASCII(homoglyphs, standardCache, 97, 125); // a-z
+        cacheASCII(homoglyphs, standardCache, 97, 122); // a-z
         cacheASCII(homoglyphs, standardCache, 65, 90); // A-Z
         cacheASCII(homoglyphs, standardCache, 48, 57); // 0-9
 
@@ -96,7 +96,7 @@ public class HomoglyphHelper {
         cacheASCII(homoglyphs, asciiCache, 58, 64); // :-@
         cacheASCII(homoglyphs, asciiCache, 91, 96); // [-`
         cacheASCII(homoglyphs, asciiCache, 123, 126); // {-~
-        cacheASCII(homoglyphs, asciiCache, 97, 125); // a-z
+        cacheASCII(homoglyphs, asciiCache, 97, 122); // a-z
         cacheASCII(homoglyphs, asciiCache, 65, 90); // A-Z
         cacheASCII(homoglyphs, asciiCache, 48, 57); // 0-9
     }
