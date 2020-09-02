@@ -53,26 +53,42 @@ public class HomoglyphHelper {
         return conn.getInputStream();
     }
 
+    private final Int2ObjectMap<Integer> orderedCache = new Int2ObjectOpenHashMap<>();
+
     /**
      * Alphanumeric cache where the key is an int character and the value is an ASCII Integer character that is similar to the key
      */
-    private Int2ObjectMap<Integer> alphanumericCache = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<Integer> alphanumericCache = new Int2ObjectOpenHashMap<>();
     /**
      * Standard keyboard cache where the key is an int character and the value is an ASCII Integer character that is similar to the key
      */
-    private Int2ObjectMap<Integer> standardCache = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<Integer> standardCache = new Int2ObjectOpenHashMap<>();
     /**
      * ASCII cache where the key is an int character and the value is an ASCII Integer character that is similar to the key
      */
-    private Int2ObjectMap<Integer> asciiCache = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<Integer> asciiCache = new Int2ObjectOpenHashMap<>();
     /**
      * Homoglyph cache where the key is an int character and the value is a set of int characters that are similar (but not equal to) the key
      */
-    private Int2ObjectMap<IntSet> homoglyphCache = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<IntSet> homoglyphCache = new Int2ObjectOpenHashMap<>();
 
     private HomoglyphHelper(List<IntSet> homoglyphs) {
         if (homoglyphs == null) {
             throw new IllegalArgumentException("homoglyphs cannot be null.");
+        }
+
+        for (IntSet glyphs : homoglyphs) {
+            if (glyphs.size() <= 1) {
+                continue;
+            }
+
+            int main = glyphs.toIntArray()[0];
+            for (int c : glyphs) {
+                if (c == main) {
+                    continue;
+                }
+                orderedCache.putIfAbsent(c, Integer.valueOf(main));
+            }
         }
 
         // We want to cache specific ranges first, because
@@ -130,6 +146,37 @@ public class HomoglyphHelper {
 
     /**
      * Returns the string given, but with unicode homoglyphs converted
+     * into their alphanumeric counterparts as per the provided list,
+     * in the order provided by that list.
+     * If there is no homoglyph for a given Unicode character, it will
+     * not be transformed.
+     *
+     * @param unicode The unicode string to alphanumeric-ify
+     * @return The transformed result
+     */
+    public String toOrderedASCII(String unicode) {
+        if (unicode == null) {
+            throw new IllegalArgumentException("unicode cannot be null.");
+        }
+        if (unicode.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        IntList chars = toChars(unicode);
+        for (int c : chars) {
+            if (c >= 0 && c <= 255) {
+                result.append(Character.toChars(c));
+            } else {
+                Integer r = orderedCache.getOrDefault(c, Integer.valueOf(c));
+                result.append(Character.toChars(r));
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * Returns the string given, but with unicode homoglyphs converted
      * into their alphanumeric counterparts, and any remaining homoglyphs
      * turned into their ASCII counterparts.
      * If there is no homoglyph for a given Unicode character, it will
@@ -149,7 +196,7 @@ public class HomoglyphHelper {
         StringBuilder result = new StringBuilder();
         IntList chars = toChars(unicode);
         for (int c : chars) {
-            if ((c >= 97 && c <= 125) || (c >= 65 && c <= 90) || (c >= 48 && c <= 57)) {
+            if ((c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 125)) {
                 result.append(Character.toChars(c));
             } else {
                 Integer r = alphanumericCache.getOrDefault(c, Integer.valueOf(c));

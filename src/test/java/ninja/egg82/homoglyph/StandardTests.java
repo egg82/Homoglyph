@@ -14,6 +14,16 @@ public class StandardTests {
     }
 
     @Test
+    public void testOrderedASCII() throws IOException {
+        HomoglyphHelper helper = HomoglyphHelper.create();
+
+        Assertions.assertEquals("TEST", helper.toOrderedASCII("TEST"));
+        Assertions.assertEquals("test", helper.toOrderedASCII("test"));
+
+        Assertions.assertEquals("1", helper.toOrderedASCII("１"));
+    }
+
+    @Test
     public void testAlphanumeric() throws IOException {
         HomoglyphHelper helper = HomoglyphHelper.create();
 
